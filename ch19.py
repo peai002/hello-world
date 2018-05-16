@@ -27,6 +27,7 @@ def xor(bstr1, bstr2):
         return xor
 
 def AES_ctr(key, nonce, counter, text):
+    ''' key = AES key, nonce and counter are length 8 bytes, b64_strings!'''
     def AES_ctr_block(key, nonce, counter):
         '''nonce has length 8 bytes = 64 bits
         counter has length 8 bytes = 64 bits'''

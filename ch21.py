@@ -7,6 +7,7 @@ Created on Tue May  8 10:37:56 2018
 
 
 """
+from os import urandom
 
 #------------------------------- MT19937 --------------------------------
 
@@ -73,3 +74,54 @@ class MT19937():
             temp = self.vector[self.counter]
             self.counter += 1
             return self.tempering_transform(temp)
+
+
+
+def untemper_transform(x):
+    u = 11
+    s, b = 7, 0x9D2C5680
+    t, c = 15, 0xEFC60000
+    l = 18
+
+    def reverse_offset_xor_and(bitstring, offset, mask):
+        ''' offset and mask are both integers'''
+        ans = bitstring[-offset:]
+        bitstring = bitstring[:-offset]
+        mask = format(mask, '032b')[:-offset]
+
+        for i in range(1, len(bitstring)+1):
+            ans = str((int(ans[-i]) & int(mask[-i])) ^ int(bitstring[-i])) + ans
+
+        return ans
+
+    def reverse_offset_xor(bitstring, offset):
+        ans = bitstring[: offset]
+        bitstring = bitstring[offset:]
+        for i in range(len(bitstring)):
+            ans += str(int(bitstring[i]) ^ int(ans[i]))
+        return ans
+
+    x = format(x, '032b')
+    y = reverse_offset_xor(x, l)
+    y = reverse_offset_xor_and(y, t, c)
+    y = reverse_offset_xor_and(y, s, b)
+    y = reverse_offset_xor(y, u)
+
+    return int(y, 2)
+
+def main():
+    rand_seed = int.from_bytes(urandom(5), 'little')
+    rng = MT19937(rand_seed)
+    internal_state = []
+    for i in range(624):
+        x = untemper_transform(rng.generate())
+        internal_state.append(x)
+
+    cloned_rng = MT19937(0)
+    cloned_rng.vector = internal_state
+    cloned_rng.counter = 624
+
+    print(cloned_rng.generate() == rng.generate())
+
+if __name__ == '__main__':
+    main()
