@@ -9,20 +9,13 @@ This project was a way for me to learn to code and to learn a bit about cryptogr
 I'm in two minds about whether to go back and edit earlier code to make it look better. I think it would be good practice and it would make the project feel more complete.
 However, on the other hand, I'm quite lazy, so I think I'll try and incorporate more sophistication as I go along.
 
-<h1>Overview </h1>
+I haven't uploaded code / solutions for every challenge. Usually this is because some of the challenges within a set are fairly simple extensions of an earlier challenge. 
 
-<h2> 9 </h2>
+<h1> Set 1 </h1>
 
-<h2> 11 </h2>
+These challenges were very useful to me in terms of learning how python works. I had a little bit of difficulty getting my head around how python handles/ stores/ encodes (bit/byte/hex/ ) strings. 
 
-<h2> 13 </h2>
+<h2> Set 2 </h2>
 
-<h2> 14 </h2>
 
-<h2> 16 </h2>
-
-<h2> 17 </h2>
-
-<h2> 18 </h2>
-
-<h2> 19 </h2>
+<h2> Set 3 </h2>
