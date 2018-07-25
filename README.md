@@ -1,7 +1,7 @@
 <h1> Cryptopals </h1>
 
 
-These are solutions that I have written to the cryptopals crypto challenges (available at the <a href="www.cryptopals.com"> cryptopals website</a>.)
+These are solutions that I have written to the cryptopals crypto challenges (available at the <a href="https://www.cryptopals.com"> cryptopals website</a>.)
 
 The solutions are written in Python. When I started writing, I had little to no knowledge of python and programming.
 This project was a way for me to learn to code and to learn a bit about cryptography. I've really enjoyed the process so far. As I've progressed I've been learning about some more advanced python techniques like exception handling and classes.
