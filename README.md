@@ -15,7 +15,12 @@ I haven't uploaded code / solutions for every challenge. Usually this is because
 
 These challenges were very useful to me in terms of learning how python works. I had a little bit of difficulty getting my head around how python handles/ stores/ encodes (bit/byte/hex/ ) strings. 
 
-<h2> Set 2 </h2>
+<h1> Set 2 </h1>
 
+<h2> Challenge 09: Implement PKCS#7 Padding </h2>
 
-<h2> Set 3 </h2>
+<h2> Challenge 11: An ECB/CBC detection oracle </h2>
+
+<h2> Challenge 13: ECB cut-and-paste </h2>
+
+<h1> Set 3 </h1>
