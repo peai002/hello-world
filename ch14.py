@@ -1,7 +1,7 @@
 from os import urandom
 from random import randint
 from base64 import b64decode
-from ch9 import pkcs
+from ch09 import pkcs
 master_key = urandom(16)
 
 def encryption_cassandra(msg):
