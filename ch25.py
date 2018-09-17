@@ -40,10 +40,10 @@ class CTR_padding_oracle:
 
 def main():
     oracle = CTR_padding_oracle()
-    a = oracle.encrypt("$$$$:admin<true")
+    a = oracle.encrypt(":admin<true")
     temp = [j for j in a]
-    temp[20] = temp[20] ^ 1
-    temp[26] = temp[26] ^ 1
+    temp[32] ^= 1
+    temp[38] ^= 1
     print(oracle.decrypt_test(bytes(temp)))
 
 if __name__ == '__main__':
