@@ -1,50 +1,47 @@
-'''§25: CTR Bitflipping
-
-There are people in the world that believe that CTR resists bit flipping
-attacks of the kind to which CBC mode is susceptible.
-
-Re-implement the CBC bitflipping exercise from earlier to use CTR mode instead
-of CBC mode. Inject an "admin=true" token.'''
-
-from os import urandom
 from Crypto.Cipher import AES
-from ch09 import pkcs
-from ch24 import counter
+from os import urandom
+import base64
+secret_key = urandom(32)
+key = "YELLOW SUBMARINE"
 
+infile = open('ch25file.txt', 'rb')
+ciphertext = infile.read()
+infile.close()
 
-class CTR_padding_oracle:
-    def __init__(self):
-        self.master_key = urandom(32)
+obj = AES.new(key, AES.MODE_ECB)
+ciphertext = base64.b64decode(ciphertext)
+plaintext = obj.decrypt(ciphertext).decode()
 
-    def encrypt(self, string):
-        string = string.replace(';', '').replace('=', '')
-        prefix = "comment1=cooking%20MCs;userdata="
-        suffix = ";comment2=%20like%20a%20pound%20of%20bacon"
-        m = prefix + string + suffix
-        obj = AES.new(self.master_key, 6, counter=counter(0)) #AES_CTR = 6
-        return obj.encrypt(pkcs.pad(m.encode(), 16))
+class counter():
+    '''counter function, increments by one when called'''
+    def __init__(self, start = 0):
+        self.value = start
+    def __call__(self):
+        self.value += 1
+        return format(self.value, '016b').encode()
 
-    def decrypt(self, bit_string):
-        obj = AES.new(self.master_key, 6, counter=counter(0))
-        string = obj.decrypt(bit_string)
-        string = pkcs.unpad(string, 16)
-        return string
+#require keyword argument counter= *kwarg
+# need to get counter to call on something. "'counter' parameter must be a
+# callable object"
+# CTR function must return bytes of length 16.
+# there is a built in way to do this from teh PyCrypto library.
 
-    def decrypt_test(self, bit_string):
-        obj = AES.new(self.master_key, 6, counter=counter(0))
-        string = obj.decrypt(bit_string)
-        string = pkcs.unpad(string, 16)
-        if b';admin=true;' in string:
-            return True
-        else: return False
+ciphertext = AES.new(secret_key, AES.MODE_CTR, counter = counter()).encrypt(plaintext)
 
-def main():
-    oracle = CTR_padding_oracle()
-    a = oracle.encrypt(":admin<true")
-    temp = [j for j in a]
-    temp[32] ^= 1
-    temp[38] ^= 1
-    print(oracle.decrypt_test(bytes(temp)))
+def edit(ciphertext, key, offset, newtext):
+    ''' offset gives the block. newtext needs to be a multiple of 16'''
+    if len(newtext) + offset*16 != len(ciphertext):
+        raise ValueError('Input strings must be a multiple of 16 in length')
+    if type(newtext) == bytes:
+        pass
+    else:
+        if type(newtext) == str:
+            newtext = newtext.encode()
+        else:
+            raise TypeError('newtext should be bytes')
+    plaintext = AES.new(key, AES.MODE_CTR, counter = counter(0)).decrypt(ciphertext)
+    plaintext = plaintext[:offset*16] + newtext
+    return AES.new(key, AES.MODE_CTR, counter = counter(0)).encrypt(plaintext)
 
 if __name__ == '__main__':
-    main()
+    print(edit(ciphertext, secret_key, 0, ciphertext).decode())
