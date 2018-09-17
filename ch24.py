@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 from Crypto.Cipher import AES
 from os import urandom
 import base64
