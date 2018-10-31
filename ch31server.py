@@ -57,7 +57,7 @@ def insecure_compare(file, signature):
     for i in range(len(test)):
         try:
             if test[i] == signature[i]:
-                sleep(0.1)
+                sleep(0.005)
             else:
                 return web.HTTPError('500')
         except IndexError:
