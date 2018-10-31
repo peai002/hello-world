@@ -4,7 +4,7 @@ import time
 
 testletters = ''.join([str(i) for i in range(10)]) +'abcdef'
 url = 'test?file=foo&signature='
-recovered = '8e543ae3b5f6cde77e'
+recovered = ''
 
 def find_next():
     times = {}
