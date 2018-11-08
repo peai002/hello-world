@@ -11,11 +11,11 @@ from time import sleep
 key = urandom(32)
 
 # test value:
-# key = b'\xd1\xa7\x8fs\x84y\xca\x08\x8c\xa0\xbey2\xfa g"Z\xbf\xed\x93u9\xb9\xdd|;>z\xe4\xc2Y'
+# key = (b'\xd1\xa7\x8fs\x84y\xca\x08\x8c\xa0\xbey2\xfa g"Z\xbf\xed\x93u9\xb9\'
+#        b'\xdd|;>z\xe4\xc2Y')
 # should output signature 9c99c56dfa3c3505de76b198bd5cd9d19797490a
-# url = 'http://0.0.0.0:8080/test?file=foo&signature=9c99c56dfa3c3505de76b198bd5cd9d19797490a'
-
-# first to define the functions we need
+# url = ('http://0.0.0.0:8080/test?file='
+#        'foo&signature=9c99c56dfa3c3505de76b198bd5cd9d19797490a')
 
 def sha_1(m, output='bytes'):
     f = sha1()
@@ -75,7 +75,7 @@ app = web.application(urls, globals())
 class verify:
     def GET(self, name):
         file, signature = process(web.ctx['query'])
-        file = file.encode() #get file into the correct format (bytes)
+        file = file.encode()
         return insecure_compare(file, signature)
 
 if __name__ == "__main__":
