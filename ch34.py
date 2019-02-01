@@ -5,12 +5,13 @@ from Crypto.Cipher import AES
 from hashlib import sha1
 from os import urandom
 import argparse
+from ch09 import pkcs
 
 # suggested usage: in three unix terminals enter the following commands (one
 # command per terminal, order matters):
-# python ch33.py -B -p 12345
-# python ch33.py -M -p 12345 12344
-# python ch33.py -A -p 12344
+# python ch34.py -B -p 12345
+# python ch34.py -M -p 12345 12344
+# python ch34.py -A -p 12344
 #
 # What should happen: Mallory will create two connections, one with Alice on port
 # 12344, one with Bob on port 123455. Alice and Bob will believe that they are
@@ -104,7 +105,6 @@ def Bob(port):
     shared_key = shared_key[:16]
     print('secret key generated')
 
-
     data = conn.recv(1024)
     print('received confirmation request')
     ciphertext, iv = data[:-16], data[-16:]
@@ -112,6 +112,15 @@ def Bob(port):
     conn.sendall(ciphertext2+iv2)
     print('sending response. connection up and running')
     # print("secret key, shared secret: ", shared_key, shared_secret)
+
+    def conversation_listen():
+        cipher = AES.new(shared_key, AES.MODE_CBC, b'a'*16)
+        while True:
+            data = conn.recv(1024)
+            text = cipher.decrypt(data)
+            print(pkcs.unpad(text, 16).decode())
+
+    conversation_listen()
 
     conn.close()
 
@@ -144,6 +153,17 @@ def Alice(port):
 
     data = s.recv(1024)
     obj.check(shared_key, data[:-16], data[-16:], message)
+
+    def conversation_speak():
+        print('you can now write to Bob')
+        cipher = AES.new(shared_key, AES.MODE_CBC, b'a'*16)
+        while True:
+            text = input().encode()
+            ctext = cipher.encrypt(pkcs.pad(text, 16))
+            s.sendall(ctext)
+
+    conversation_speak()
+
     s.close()
 
     # print("secret key, shared secret: ", shared_key, shared_secret)
@@ -203,6 +223,17 @@ def Mallory(portA, portB):
     sha.update(b'0')
     shared_key = sha.digest()
     shared_key = shared_key[:16]
+
+    def conversation_eavesdrop():
+        cipher = AES.new(shared_key, AES.MODE_CBC, b'a'*16)
+        while True:
+            data = connA.recv(1024)
+            text = cipher.decrypt(data)
+            print(pkcs.unpad(text, 16).decode())
+            sB.sendall(data)
+
+    conversation_eavesdrop()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
