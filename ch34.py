@@ -5,15 +5,16 @@ from Crypto.Cipher import AES
 from hashlib import sha1
 from os import urandom
 import argparse
-from ch09 import pkcs
 
-# suggested usage: in two unix terminals enter the following commands (one
+# suggested usage: in three unix terminals enter the following commands (one
 # command per terminal, order matters):
 # python ch33.py -B -p 12345
-# python ch33.py -A -p 12345
+# python ch33.py -M -p 12345 12344
+# python ch33.py -A -p 12344
 #
-# What should happen: Bob and Alice establish a shared key. Alice can now write
-# to Bob, encrypting their communication on the wire!
+# What should happen: Mallory will create two connections, one with Alice on port
+# 12344, one with Bob on port 123455. Alice and Bob will believe that they are
+# communicating securely with one another, but Mallory is mitm'ing the connection!
 
 def modexp(a, b, m):
    s = 1
@@ -112,15 +113,6 @@ def Bob(port):
     print('sending response. connection up and running')
     # print("secret key, shared secret: ", shared_key, shared_secret)
 
-    def conversation_listen():
-        cipher = AES.new(shared_key, AES.MODE_CBC, b'a'*16)
-        while True:
-            data = conn.recv(1024)
-            text = cipher.decrypt(data)
-            print(pkcs.unpad(text, 16).decode())
-
-    conversation_listen()
-
     conn.close()
 
 def Alice(port):
@@ -152,20 +144,65 @@ def Alice(port):
 
     data = s.recv(1024)
     obj.check(shared_key, data[:-16], data[-16:], message)
-
-    def conversation_speak():
-        print('you can now write to Bob')
-        cipher = AES.new(shared_key, AES.MODE_CBC, b'a'*16)
-        while True:
-            text = input().encode()
-            ctext = cipher.encrypt(pkcs.pad(text, 16))
-            s.sendall(ctext)
-
-    conversation_speak()
-
     s.close()
 
     # print("secret key, shared secret: ", shared_key, shared_secret)
+
+def Mallory(portA, portB):
+    #A --> M; receiving initial parameters
+    host = 'localhost'
+    sA = socket.socket()
+    sA.bind((host, portA))
+    sA.listen(1)
+    print('Port open')
+    connA, addr = sA.accept()
+    print('Connected by', addr)
+
+    data = connA.recv(1024)
+    p, g, A = data.decode().split()
+    p = int(p); g = int(g); A = int(A)
+    print('received parameters')
+
+    # M --> B; sending malicious parameters
+    host = 'localhost'
+    sB = socket.socket()
+    sB.connect((host, portB))
+    print('connected to host')
+
+    obj = DHKeyAgreement()
+    p, g, A, a = obj.hello()
+    print('sent malicious parameters')
+    data = b'%i %i %i' % (p, g, p)
+    sB.sendall(data)
+
+    # B --> M; receiving key exchange material from B
+    data = sB.recv(1024)
+    B = int(data.decode())
+    print('received key information')
+
+    # M --> A; sending malicious key exchange material to A
+    connA.sendall(str(p).encode())
+    print('sent malicious key exchange material')
+
+    # A --> M; receive message from A
+    data = connA.recv(1024)
+    print('received confirmation request')
+
+
+    # M --> B; relaying message from A to B
+    sB.sendall(data)
+
+    # B --> M; receiving confirmation message from B
+    data = sB.recv(1024)
+
+    # M --> A; relaying that message to A
+    connA.sendall(data)
+
+    # for reference, here is the poisoned key!!
+    sha = sha1()
+    sha.update(b'0')
+    shared_key = sha.digest()
+    shared_key = shared_key[:16]
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -173,14 +210,19 @@ if __name__ == '__main__':
     group.add_argument("-A", "--Alice", action="store_true")
     group.add_argument("-B", "--Bob", action="store_true")
     group.add_argument("-M", "--Mallory", action="store_true")
-    parser.add_argument("-p", "--port", nargs=1, default=[12344],
+    parser.add_argument("-p", "--port", nargs='*', default=[12344],
                         type=int)
 
     args = parser.parse_args()
-
-    if len(args.port) == 1:
+    if len(args.port) == 2:
+        portB, portA = args.port[0], args.port[1]
+    elif len(args.port) == 1:
         portA = portB = args.port[0]
+    elif len(args.port) > 2:
+        raise ValueError
     if args.Alice:
         Alice(portA)
     if args.Bob:
         Bob(portB)
+    if args.Mallory:
+        Mallory(portA, portB)
