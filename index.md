@@ -11,12 +11,12 @@ what is going on. this is some text.
 
 here is a second attempt at a list:
 * item 1
- *sub item
- *sub item 2
+ * sub item
+ * sub item 2
   * sub sub item
   * sub sub item 2
 * item 2
-  *sub sub item?
+  * sub sub item?
 * item 3
 
 here is a [link](www.google.com)
