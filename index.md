@@ -1,3 +1,7 @@
+---
+usemathjax: true
+---
+
 ### hello this is a website for the github repository for cryptopals challenges
 
 #### this is a title
