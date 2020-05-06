@@ -1,0 +1,96 @@
+---
+layout: presentation
+title: Through the Lens of Oracle: Eﬃcient Algorithm for Finding Selective Classiﬁer
+permalink: /efficient-selective-classifiers/
+---
+
+class: center, middle
+ 
+# Through the Lens of Oracle: Eﬃcient Algorithm for Finding Selective Classiﬁer
+
+### Presented by Yanlin (Alan) Duan, Rong Zhou
+ 
+---
+ 
+# Review of selective classifier
+
+Recall the definition of a selective classifier:
+
+--
+
+A selective classiﬁer `\(C\)` is a tuple `\((h, (\gamma_1, \cdots , \gamma_m)\)`, where `\(h\)` lies in a hypothesis class `\(\mathcal{H}\)`, and `0 \le \gamma_i \le 1\)` for all `\(i = 1, \cdots , m\)`. For any `\(x_{n+j} \in U\)`, `\(C(x_{n+j}) = h(x_{n+j})\)` wp `\(gamma_j\)` and `\(0\)` wp `\(1 − \gamma_j\)`.
+
+---
+
+# Review of selective classifier
+
+Below is the algorithm (optimization problem) for finding selective classifier:
+
+.center[![:scale 60%]({{ site.url }}/assets/pics/selective-classifier1.png)]
+
+--
+
+How many constraints do we have?
+
+--
+
+As many as `\(|V|)`!
+
+---
+
+# Motivation of our project
+
+--
+
+Can we solve the optimization problem more efficiently by accessing the hypothesis class not directly through (large amount of) constraints, but through some ERM oracle?
+
+--
+
+Yes!
+
+--
+
+Definition of ERM oracle we use: For a set of hypothesis `\(\mathcal{H}\)`, the `\(\textit{Weighted ERM Oracle}\)` is an algorithm, which for any sequence `\((x_1,y_1,w_1),(x_2,y_2,w_2),...(x_t,y_t,w_t) \in Z \subseteq \mathcal{X} \times Y \times \mathbb{R}_{\ge 0}\)`, returns
+`\(
+  \text{argmin}_{h \in \mathcal{H}} \text{ } \sum_{(x,y,w) \in Z}\mathbbm{1}\{h(x) \ne y\}\cdot w
+\)`
+
+---
+
+# Main Algorithm
+
+.center[![:scale 60%]({{ site.url }}/assets/pics/selective-classifier2.png)]
+
+---
+
+# Analysis of algorithm
+
+Question: After how many rounds will the algorithm halt?
+
+--
+
+High level idea:
+
+.center[![:scale 60%]({{ site.url }}/assets/pics/selective-classifier3.png)]
+
+---
+
+# Find step size
+
+Transform from primal to dual by introducing Lagrange multipliers:
+
+`\(
+  
+  \mathcal{L} = \sum_{i = 1}^m \frac{1}{\gamma_i} + \sum_{j = 1}^N \lambda_j \left( \left( \sum_{i = 1}^m \gamma_i \mathbbm{1}_{h_j(x_{n+i}) \neq h_0(x_{n+i})} \right) - \epsilon m \right)
+
+\)`
+
+--
+
+Find derivative and set to zero. Substitute `\(\gamma_i\)` using the following:
+
+`\(
+
+  \gamma_i^2 = \left(\sum_{j = 1}^N \lambda_j \mathbbm{1}_{h_j(x_{n+i}) \neq h_0(x_{n+i})} \right)^{-1}
+
+\)'
