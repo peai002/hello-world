@@ -1,5 +1,5 @@
 ---
-usemathjax: true
+mathjax: true
 ---
 
 ### hello this is a website for the github repository for cryptopals challenges
