@@ -19,7 +19,7 @@ here is a second attempt at a list:
   * sub sub item?
 * item 3
 
-here is a [link](www.google.com)
+here is a [link](https://www.google.com)
 
 ![Black cat][Black]
 
