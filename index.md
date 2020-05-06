@@ -1,10 +1,15 @@
 ---
+title: "welcome page"
+excerpt: "welcoming you in a lovely way"
+tags:
+  - blog
+
 mathjax: true
 ---
 
-### hello this is a website for the github repository for cryptopals challenges
+# hello this is a website for the github repository for cryptopals challenges
 
-#### this is a title
+# this is a title
 
 what is going on. this is some text.
 
@@ -25,7 +30,7 @@ here is a second attempt at a list:
 
 here is a [link](https://www.google.com)
 
-#### let's try some maths!
+# let's try some maths!
 
 $$
 \begin{aligned}
